@@ -1,0 +1,130 @@
+import tkinter as tk
+from tkinter import PhotoImage
+from datetime import datetime
+import subprocess
+
+def clear_screen():
+    # Limpa a tela do terminal
+    print("Conectado...\n")
+
+def alterar_ip(choice):
+    # Função para alterar o IP
+    IPADDR2 = "192.168.101.2"
+    IPADDR3 = "192.168.1.100"
+    IPADDR4 = "192.168.2.100"
+    IPADDR5 = "192.168.3.100"
+    IPADDR6 = "192.168.10.2"
+    IPADDR7 = "192.168.2.101"
+
+    IPADDR10 = "192.168.101.1"
+    IPADDR11 = "192.168.1.101"
+    IPADDR12 = "192.168.2.1"
+    IPADDR13 = "192.168.3.31"
+    IPADDR14 = "192.168.10.1"
+    IPADDR15 = "192.168.2.100"
+
+    if choice == 'DHCP Automático':
+        subprocess.run(["netsh", "interface", "ip", "set", "address", "Ethernet", "source=dhcp"])
+        return f"DHCP SUCCESS... Pressione Enter para continuar."
+    elif choice == 'IP 192.168.101.1 ---- ONU':
+        subprocess.run(["netsh", "interface", "ip", "set", "address", "name=Ethernet", f"source=static", f"addr={IPADDR2}", "mask=255.255.255.0"])
+        return f"IP {IPADDR10} SUCCESS... Pressione Enter para continuar."
+    elif choice == 'IP 192.168.1.101 ---- OLT':
+        subprocess.run(["netsh", "interface", "ip", "set", "address", "name=Ethernet", f"source=static", f"addr={IPADDR3}", "mask=255.255.255.0"])
+        return f"IP {IPADDR11} SUCCESS... Pressione Enter para continuar."
+    elif choice == 'IP 192.168.2.1 ---- PAC SW IC PLUS':
+        subprocess.run(["netsh", "interface", "ip", "set", "address", "name=Ethernet", f"source=static", f"addr={IPADDR4}", "mask=255.255.255.0"])
+        return f"IP {IPADDR12} SUCCESS... Pressione Enter para continuar."
+    elif choice == 'IP 192.168.3.31 ---- PAC SW':
+        subprocess.run(["netsh", "interface", "ip", "set", "address", "name=Ethernet", f"source=static", f"addr={IPADDR5}", "mask=255.255.255.0"])
+        return f"IP {IPADDR13} SUCCESS... Pressione Enter para continuar."
+    elif choice == 'IP 192.168.10.1 ---- ROTEADOR':
+        subprocess.run(["netsh", "interface", "ip", "set", "address", "name=Ethernet", f"source=static", f"addr={IPADDR6}", "mask=255.255.255.0"])
+        return f"IP {IPADDR14} SUCCESS... Pressione Enter para continuar."
+    elif choice == 'IP 192.168.2.101 ---- ROT PADRAO':
+        subprocess.run(["netsh", "interface", "ip", "set", "address", "name=Ethernet", f"source=static", f"addr={IPADDR7}", "mask=255.255.255.0"])
+        return f"IP {IPADDR15} SUCCESS... Pressione Enter para continuar."
+
+def show_menu():
+    # Cria uma nova janela
+    root = tk.Tk()
+    root.title("Gerenciamento IP / PING")
+    root.configure(bg="#2c3e50")  # Cor de fundo azul marinho claro
+    root.iconbitmap("ip3.ico")
+
+    label_title = tk.Label(root, text="SELECIONE:", pady=10, padx=100, bg="#2c3e50", fg="white", font=("Arial", 14, "bold"))
+    label_title.pack()
+
+    # Função para lidar com a seleção do usuário
+    def handle_choice(choice):
+        if choice == 'Alterar IP':
+            clear_screen()
+            menu_alterar_ip()
+        elif choice == 'PING':
+            print("A lógica para PING precisa ser implementada.")
+        else:
+            root.destroy()
+
+    # Cria botões para cada opção
+    button_alterar_ip = tk.Button(root, text="Alterar IP", pady=12, padx=2, bg="#3498db", fg="white", font=("Arial", 12, "bold"), command=lambda: handle_choice('Alterar IP'))
+    button_alterar_ip.pack(pady=5)
+
+    button_exit = tk.Button(root, text="Sair", pady=5, padx=5, bg="#e74c3c", fg="white", font=("Arial", 12, "bold"), command=root.destroy)
+    button_exit.pack(pady=10)
+
+    root.mainloop()
+
+def menu_alterar_ip():
+    # Cria uma nova janela para o menu de alteração de IP
+    root_alterar_ip = tk.Tk()
+    root_alterar_ip.title("Alteração de IP")
+    root_alterar_ip.configure(bg="#2c3e50")  # Cor de fundo azul marinho claro
+    root_alterar_ip.iconbitmap("ip3.ico")
+
+
+    # Função para lidar com a seleção do usuário no menu de alteração de IP
+    
+    def handle_choice_alterar_ip(choice):
+        clear_screen()
+        result = alterar_ip(choice)
+        print(alterar_ip(choice))
+    
+    # Extrai o endereço IP do resultado da alteração
+        ip_address = extract_ip_address(result)
+    
+    # Abre uma janela de prompt de comando e executa o comando de ping para o IP selecionado
+        subprocess.run(["start", "cmd", "/k", f"ping {ip_address} -t"], shell=True)
+
+    def extract_ip_address(result_str):
+    # Função para extrair o endereço IP da string de resultado
+        parts = result_str.split()
+        for part in parts:
+            if part.count('.') == 3:  # Verifica se é um endereço IP válido
+               return part
+               
+    label_title = tk.Label(root_alterar_ip, text="Selecione uma opção para alterar o IP:", bg="#2c3e50", fg="white", font=("Arial", 14, "bold"))
+    label_title.pack()
+
+    options = [
+        'DHCP Automático',
+        'IP 192.168.101.1 ---- ONU',
+        'IP 192.168.1.101 ---- OLT',
+        'IP 192.168.2.1 ---- PAC SW IC PLUS',
+        'IP 192.168.3.31 ---- PAC SW',
+        'IP 192.168.10.1 ---- ROTEADOR',
+        'IP 192.168.2.101 ---- ROT PADRAO'
+    ]
+
+    # Função para criar botões dinamicamente
+    def create_button(option):
+        return tk.Button(root_alterar_ip, text=option, bg="#3498db", fg="white", font=("Arial", 12, "bold"), command=lambda option=option: handle_choice_alterar_ip(option))
+
+    # Cria os botões para cada opção
+    for option in options:
+        button = create_button(option)
+        button.pack(pady=5)
+
+    root_alterar_ip.mainloop()
+
+if __name__ == "__main__":
+    show_menu()
